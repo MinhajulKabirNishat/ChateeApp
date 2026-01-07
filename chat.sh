@@ -17,48 +17,42 @@ read USERNAME
 
 if [ "$1" == "server" ]; then
     echo -e "${GREEN}🟢 Chat server started on port $PORT${RESET}"
+    echo -e "${GREEN}Multiple clients supported${RESET}"
+    echo -e "${GREEN}Messages logged to $LOG_FILE${RESET}"
 
-    echo "Waiting for client..."
-    echo "Messages will be logged in $LOG_FILE"
+    ncat -l -p $PORT --keep-open --broker | while read MESSAGE; do
+        TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
-    ncat -l -p $PORT | while read MESSAGE; do
-    TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+        if [[ "$MESSAGE" == *"left the chat"* ]]; then
+            echo -e "${YELLOW}[$TIMESTAMP] $MESSAGE${RESET}"
+        else
+            echo -e "${BLUE}[$TIMESTAMP] $MESSAGE${RESET}"
+        fi
 
-   
-    if [[ "$MESSAGE" == *"left the chat"* ]]; then
-        echo -e "${YELLOW}[$TIMESTAMP] $MESSAGE${RESET}"
-    else
-        echo -e "${BLUE}[$TIMESTAMP] $MESSAGE${RESET}"
-    fi
-
-  
-    echo "[$TIMESTAMP] $MESSAGE" >> "$LOG_FILE"
-done
-
+        echo "[$TIMESTAMP] $MESSAGE" >> "$LOG_FILE"
+    done
 
 
 elif [ "$1" == "client" ]; then
     if [ -z "$2" ]; then
         echo "❌ Usage: ./chat.sh client <SERVER_IP>"
-        exit 1j
+        exit 1
     fi
 
     echo "🔵 Connected to server at $2:$PORT"
-    echo "Type messages and press Enter (Ctrl+C to exit)"
+    echo "Type messages. Type /exit to leave."
 
-   while true; do
-    read MESSAGE
-
-    if [ "$MESSAGE" == "/exit" ]; then
-       echo "[$USERNAME] left the chat."
-       echo "[$USERNAME] left the chat." | ncat "$2" $PORT
-
- 
-        break
-    fi
-
-    echo "[$USERNAME]: $MESSAGE" | ncat "$2" $PORT
-done
+    
+    {
+        while read MESSAGE; do
+            if [ "$MESSAGE" == "/exit" ]; then
+                echo "[$USERNAME] left the chat."
+                echo "[$USERNAME] left the chat."
+                break
+            fi
+            echo "[$USERNAME]: $MESSAGE"
+        done
+    } | ncat "$2" $PORT
 
 
 
