@@ -3,6 +3,12 @@
 PORT=5000
 LOG_FILE="logs/chat.log"
 
+GREEN="\033[0;32m"
+BLUE="\033[0;34m"
+YELLOW="\033[0;33m"
+RESET="\033[0m"
+
+
 
 
 echo "Enter your username:"
@@ -10,14 +16,24 @@ read USERNAME
 
 
 if [ "$1" == "server" ]; then
-    echo "🟢 Chat server started on port $PORT"
+    echo -e "${GREEN}🟢 Chat server started on port $PORT${RESET}"
+
     echo "Waiting for client..."
     echo "Messages will be logged in $LOG_FILE"
 
     ncat -l -p $PORT | while read MESSAGE; do
-        TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-        echo "[$TIMESTAMP] $MESSAGE" | tee -a "$LOG_FILE"
-    done
+    TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+
+   
+    if [[ "$MESSAGE" == *"left the chat"* ]]; then
+        echo -e "${YELLOW}[$TIMESTAMP] $MESSAGE${RESET}"
+    else
+        echo -e "${BLUE}[$TIMESTAMP] $MESSAGE${RESET}"
+    fi
+
+  
+    echo "[$TIMESTAMP] $MESSAGE" >> "$LOG_FILE"
+done
 
 
 
