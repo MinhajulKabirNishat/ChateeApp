@@ -30,10 +30,20 @@ elif [ "$1" == "client" ]; then
     echo "🔵 Connected to server at $2:$PORT"
     echo "Type messages and press Enter (Ctrl+C to exit)"
 
-    while true; do
-        read MESSAGE
-        echo "[$USERNAME]: $MESSAGE" | ncat "$2" $PORT
-    done
+   while true; do
+    read MESSAGE
+
+    if [ "$MESSAGE" == "/exit" ]; then
+       echo "[$USERNAME] left the chat."
+       echo "[$USERNAME] left the chat." | ncat "$2" $PORT
+
+ 
+        break
+    fi
+
+    echo "[$USERNAME]: $MESSAGE" | ncat "$2" $PORT
+done
+
 
 
 else
