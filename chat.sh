@@ -2,10 +2,16 @@
 
 PORT=5000
 
+
+echo "Enter your username:"
+read USERNAME
+
+
 if [ "$1" == "server" ]; then
     echo "🟢 Chat server started on port $PORT"
     echo "Waiting for client..."
     ncat -l -p $PORT
+
 
 elif [ "$1" == "client" ]; then
     if [ -z "$2" ]; then
@@ -14,7 +20,13 @@ elif [ "$1" == "client" ]; then
     fi
 
     echo "🔵 Connected to server at $2:$PORT"
-    ncat "$2" $PORT
+    echo "Type messages and press Enter (Ctrl+C to exit)"
+
+    while true; do
+        read MESSAGE
+        echo "[$USERNAME]: $MESSAGE" | ncat "$2" $PORT
+    done
+
 
 else
     echo "Usage:"
