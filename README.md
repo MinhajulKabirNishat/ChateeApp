@@ -97,6 +97,13 @@ These are advanced and impressive features.
 4. Host on a cloud server
 
 
+<b>Server IP =127.0.0.1 (localhost)<br>
+Client and server are on the same computer</b>
+
+<b>For internet messages my friend use </b>
+IP =163.227.144.23
+
+
 # Acknowledgement
 This project was built as a learning exercise to understand shell scripting and networking concepts step by step.
 
